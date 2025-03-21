@@ -2,12 +2,21 @@ import java.io.*;
 import java.util.*;
 
 
-class account{
+class Account{
     private double balance;
+    private String name;
+    private String id;
+    private String code;
+    private String branch;
 
 
-    public account(){
+    public account(String name, double balance, String id, String code, String branch){
         this.balance=balance;
+        this.name=name;
+        this.id=id;
+        this.code=code;
+        this.branch=branch;
+
     }
 
     public void depositethemoney(double deposite){
@@ -31,19 +40,41 @@ class account{
         System.out.println("Your balance is: "+this.balance);
     }
 
+    public void displayDetails(){
+        System.out.println("Customer Details:");
+        System.out.println("Customer Name: "+ name);
+        System.out.println("Customer Id: "+id);
+        System.out.println("Branch Name: "+branch);
+        System.out.println("Current balance: "+balance);
+
+    }
+
 }
 
 public class bank{
     private static final String filename = "customers.csv";
-    Map(code, Account) Customermap = new HashMap<>();
+    private static Map(code, Account) Customermap = new HashMap<>();
+
     public static void main(String args[]){
 
-        account acc = new account();
+        loadthedetails();
+
+        //account acc = new account();
         Scanner scan = new Scanner(System.in);
 
 
         System.out.println("Welcome to GN bank..");
         System.out.println();
+
+        int inputcode = scan.nextInt();
+        Account acc = Customermap.get(inputcode);
+
+        if(acc==null){
+            System.out.print("Invalid Code!");
+            return;
+        }
+
+        acc.displayDetails();
 
         while(true){
             System.out.println();
@@ -60,11 +91,13 @@ public class bank{
                 System.out.println("Enter how much you want to deposite: ");
                 double deposite = scan.nextDouble();
                 acc.depositethemoney(deposite);
+                updateCustomerData();
             }
             else if(option==2){
                 System.out.println("Enter how much you want to widraw: ");
                 double widraw = scan.nextDouble();
                 acc.widrawthemoney(widraw);
+                updateCustomerData();
             }
 
             else if(option==3){
@@ -82,7 +115,31 @@ public class bank{
 
         }
 
+    }
 
+    private static void  loadthedetails(){
+        try(BufferedReader br = new BufferedReader(new FileReader(filename))){
+            String line;
+            while((line=br.readLine())!=null){
+                String[] details = line.split(",");
+                if(details.length==5){
+                    
+                    String name = details[0];
+                    String branch = details[1];
+                    String code = details[2];
+                    double balance = details[3];
+                    String id = details[4];
 
+                    Account account = new Account(name,balance,id,code,branch);
+                    Customermap.put(code,account);
+                }
+
+            }
+        }
+        
+        catch(IOException e){
+            System.out.print("Error updating!!");
+        }
     }
 }
+
