@@ -10,7 +10,7 @@ class Account{
     private String branch;
 
 
-    public account(String name, double balance, String id, String code, String branch){
+    public Account(String name, double balance, String id, String code, String branch){
         this.balance=balance;
         this.name=name;
         this.id=id;
@@ -42,6 +42,7 @@ class Account{
 
     public void displayDetails(){
         System.out.println("Customer Details:");
+        System.out.println();
         System.out.println("Customer Name: "+ name);
         System.out.println("Customer Id: "+id);
         System.out.println("Branch Name: "+branch);
@@ -49,24 +50,29 @@ class Account{
 
     }
 
+    public String tocsv(){
+        return name + "," + branch + "," + code + "," + balance + "," + id;
+    }
+
 }
 
 public class bank{
     private static final String filename = "customers.csv";
-    private static Map(code, Account) Customermap = new HashMap<>();
+    private static Map<String, Account> Customermap = new HashMap<>();
 
     public static void main(String args[]){
 
         loadthedetails();
 
-        //account acc = new account();
+        
         Scanner scan = new Scanner(System.in);
 
 
-        System.out.println("Welcome to GN bank..");
-        System.out.println();
+        System.out.println("Welcome to GN bank!");
+        
+        System.out.print("Enter your code here: ");
 
-        int inputcode = scan.nextInt();
+        String inputcode = scan.nextLine();
         Account acc = Customermap.get(inputcode);
 
         if(acc==null){
@@ -94,7 +100,7 @@ public class bank{
                 updateCustomerData();
             }
             else if(option==2){
-                System.out.println("Enter how much you want to widraw: ");
+                System.out.print("Enter how much you want to widraw: ");
                 double widraw = scan.nextDouble();
                 acc.widrawthemoney(widraw);
                 updateCustomerData();
@@ -127,7 +133,7 @@ public class bank{
                     String name = details[0];
                     String branch = details[1];
                     String code = details[2];
-                    double balance = details[3];
+                    double balance = Double.parseDouble(details[3]);
                     String id = details[4];
 
                     Account account = new Account(name,balance,id,code,branch);
@@ -139,6 +145,18 @@ public class bank{
         
         catch(IOException e){
             System.out.print("Error updating!!");
+        }
+    }
+
+    private static void updateCustomerData(){
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(filename))){
+            for(Account acc : Customermap.values()){
+                bw.write(acc.tocsv());
+                bw.newLine();
+            }
+        }
+        catch(IOException e){
+            System.out.println("Error updating Customer data!!");
         }
     }
 }
